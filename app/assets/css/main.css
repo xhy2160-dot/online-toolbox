@@ -1,0 +1,13 @@
+/* assets/css/main.css */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #EAE3DA;
+    color: #2B2927;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
