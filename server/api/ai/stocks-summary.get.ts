@@ -2,7 +2,7 @@
 import Groq from "groq-sdk";
 
 // Initialize the Groq SDK using the developer console environment variable key
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq = new Groq({ apiKey: useRuntimeConfig().groqApiKey || process.env.GROQ_API_KEY });
 
 let cache: { summary: string; timestamp: number } | null = null;
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hour caching layer

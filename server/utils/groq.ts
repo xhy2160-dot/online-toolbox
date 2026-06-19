@@ -1,8 +1,9 @@
 // server/api/ai/stocks-summary.get.ts
 import Groq from "groq-sdk";
 
+const config = useRuntimeConfig()
 // Initialize the Groq SDK using the developer console environment variable key
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq = new Groq({ apiKey: config.groqApiKey || process.env.GROQ_API_KEY });
 
 
 const askGroq = async (query:string) =>{

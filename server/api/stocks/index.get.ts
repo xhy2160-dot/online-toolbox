@@ -7,7 +7,7 @@ export default defineEventHandler(async () => {
             const data: any = await $fetch('https://finnhub.io/api/v1/quote', {
                 query: {
                     symbol: ticker,
-                    token: process.env.FINNHUB_API_KEY,
+                    token: useRuntimeConfig().finnhubApiKey || process.env.FINNHUB_API_KEY,
                 }
             })
             return {

@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
                 sortBy: 'publishedAt',
                 page,
                 pageSize,
-                apiKey: process.env.NEWS_API_KEY,
+                apiKey: useRuntimeConfig().newsApiKey ||process.env.NEWS_API_KEY,
             }
         })
         return data.articles.filter((a: any) => a.title && a.urlToImage)
