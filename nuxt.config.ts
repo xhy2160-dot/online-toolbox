@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: true },
   css:["~/assets/css/main.css"],
-  modules: ['@nuxtjs/google-fonts'],
+  modules: ['nuxt-auth-utils','@nuxtjs/google-fonts'],
   googleFonts: {
     families: {
       Inter: [400, 600, 700],

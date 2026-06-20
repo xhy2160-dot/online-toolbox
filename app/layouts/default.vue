@@ -1,25 +1,30 @@
 <template>
-  <div class="site" :class="{ 'no-scroll-view': route.path === '/' }">
-    <AppNav />
+  <!-- <div class="site" :class="{ 'no-scroll-view': route.path === '/' }"> -->
+  <div class="site">
+    <AppNav @open-login="showLogin = true" />
     <main class="main-content">
       <slot />
     </main>
     <AppFooter />
+    <LoginModal v-model="showLogin" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 const route = useRoute()
+const showLogin = ref(false)
 </script>
 
 <style>
 /* Reset basic spacing to prevent phantom scrollbars */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background-color: #f0ebe3; /* Set background on body so scrolling feels uniform */
+  background-color: #f0ebe3;
+  /* Set background on body so scrolling feels uniform */
 }
 
 .site {

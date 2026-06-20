@@ -58,29 +58,24 @@
       <div class="popular-header">
         <span class="popular-title">POPULAR TOOLS</span>
       </div>
-      <div class="tools-grid">
-        <ToolCard v-for="tool in popularTools" :key="tool.name" :tool="tool" />
+
+      <div v-if="pending" class="state">Loading tools...</div>
+      <div v-else-if="error" class="state">Failed to load tools.</div>
+      <div v-else class="tools-grid">
+        <ToolCard v-for="tool in tools" :key="tool.id" :tool="tool" />
       </div>
     </aside>
   </div>
 </template>
 
 <script setup lang="ts">
-const popularTools = [
-  { name: 'Email Rewriter', description: 'Rewrite emails in any tone using AI instantly.', icon: '✉', url: '/tools/email-rewriter' },
-  { name: 'JSON Formatter', description: 'Format, beautify, and validate JSON data instantly in your browser.', icon: '{ }', url: '/tools/json-formatter' },
-  { name: 'Base64 Encoder', description: 'Encode and decode Base64 strings quickly client-side.', icon: '64', url: '/tools/base64' },
-  { name: 'Password Generator', description: 'Generate strong, secure passwords with custom rules.', icon: '🔑', url: '/tools/password-generator' },
-  { name: 'Color Picker', description: 'Pick, convert and generate color palettes easily.', icon: '🎨', url: '/tools/color-picker' },
-  { name: 'Markdown Preview', description: 'Write and preview Markdown in real time.', icon: 'MD', url: '/tools/markdown' },
-]
+const { data: tools, pending, error } = await useFetch('/api/productivity/tools')
 </script>
 
 <style scoped>
 .page {
   display: flex;
   gap: 4rem;
-  min-height: calc(100vh - 130px);
   align-items: flex-start;
 }
 
@@ -90,6 +85,8 @@ const popularTools = [
   flex-direction: column;
   justify-content: center;
   padding: 3rem 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .status-bar {
@@ -227,6 +224,8 @@ const popularTools = [
   display: flex;
   flex-direction: column;
   padding: 3rem 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .popular-header {
@@ -247,5 +246,70 @@ const popularTools = [
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.75rem;
+}
+
+.state {
+  color: #666;
+  font-size: 0.85rem;
+  padding: 1rem 0;
+}
+
+/* TABLET */
+@media (max-width: 900px) {
+  .page {
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .hero {
+    padding: 2rem 0 0;
+  }
+
+  .popular {
+    padding: 0 0 2rem;
+    width: 100%;
+  }
+
+  .tools-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+  .hero-title {
+    font-size: clamp(1.75rem, 9vw, 2.5rem);
+  }
+
+  .hero-sub {
+    font-size: 0.9rem;
+  }
+
+  .search-bar {
+    padding: 0.75rem 1rem;
+  }
+
+  .search-placeholder {
+    font-size: 0.8rem;
+  }
+
+  .stats {
+    gap: 1.25rem;
+  }
+
+  .stat-num {
+    font-size: 1.2rem;
+  }
+
+  .tools-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* SMALL MOBILE */
+@media (max-width: 380px) {
+  .tools-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

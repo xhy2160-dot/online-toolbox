@@ -24,5 +24,6 @@ export const tools = mysqlTable('tools', {
     catId: int('cat_id').notNull(),
     clicks: int('clicks').default(0).notNull(),
     description: text('description'),
-    img: varchar('img', { length: 500 }),
+    icon: varchar('icon', { length: 500 }),
+    url: varchar('url', { length: 300 }),
 })

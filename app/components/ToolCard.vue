@@ -8,7 +8,7 @@
     <p class="card-desc">{{ tool.description }}</p>
 
     <Transition name="fade">
-      <a v-if="hovered" :href="tool.url" class="open-link">
+      <a v-if="hovered" :href="tool.url ?? undefined" class="open-link">
         Open tool <span class="chevron">›</span>
       </a>
     </Transition>
@@ -18,13 +18,10 @@
 <script setup lang="ts">
 const hovered = ref(false)
 
+import type { SerializedTool } from '~~/shared/types/tool'
+
 defineProps<{
-  tool: {
-    name: string
-    description: string
-    icon: string
-    url: string
-  }
+  tool: SerializedTool
 }>()
 </script>
 

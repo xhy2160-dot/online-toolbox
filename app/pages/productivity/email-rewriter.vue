@@ -2,7 +2,7 @@
 <template>
   <div class="tool">
     <div class="tool-header">
-      <NuxtLink to="/tools" class="back">← Tools</NuxtLink>
+      <NuxtLink to="/productivity" class="back">← Productivity</NuxtLink>
       <h1>Email Rewriter</h1>
       <p>Paste your email and rewrite it in any tone instantly.</p>
     </div>
@@ -73,7 +73,7 @@ async function rewrite() {
   output.value = ''
 
   try {
-    const response = await $fetch('/api/tools/email-rewriter', {
+    const response = await $fetch('/api/productivity/email-rewriter', {
       method: 'POST',
       body: {
         email: input.value,
@@ -81,6 +81,7 @@ async function rewrite() {
       }
     })
     output.value = response.data.response
+    await $fetch(`/api/productivity/${3}/counter`, { method: 'POST' })
   } catch {
     output.value = 'Something went wrong. Please try again.'
   } finally {
