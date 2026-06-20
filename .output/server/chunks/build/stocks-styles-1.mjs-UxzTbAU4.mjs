@@ -1,0 +1,4 @@
+const StockCard_vue_vue_type_style_index_0_scoped_e526115a_lang = ".card[data-v-e526115a]{background:#fff;border-radius:12px;padding:1.5rem;border:1px solid #e8e0d8;display:flex;flex-direction:column;gap:1rem}.card-top[data-v-e526115a]{display:flex;justify-content:space-between;align-items:center}.ticker[data-v-e526115a]{font-size:1.25rem}.price[data-v-e526115a],.ticker[data-v-e526115a]{font-weight:700}.price[data-v-e526115a]{font-size:1.5rem}.card-bottom[data-v-e526115a]{display:flex;justify-content:space-between;align-items:center}.change[data-v-e526115a]{font-weight:600;font-size:.95rem}.up[data-v-e526115a]{color:#16a34a}.down[data-v-e526115a]{color:#dc2626}.range[data-v-e526115a]{font-size:.8rem;color:#999}";
+
+export { StockCard_vue_vue_type_style_index_0_scoped_e526115a_lang as S };
+//# sourceMappingURL=stocks-styles-1.mjs-UxzTbAU4.mjs.map
