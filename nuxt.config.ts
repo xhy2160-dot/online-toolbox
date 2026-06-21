@@ -8,6 +8,10 @@ export default defineNuxtConfig({
     newsApiKey: process.env.NEWS_API_KEY,
     finnhubApiKey: process.env.FINNHUB_API_KEY,
     databaseUrl: process.env.DATABASE_URL,
+    nuxtSessionPswd:process.env.NUXT_SESSION_PASSWORD,
+    public: {
+      gaMeasurementId: process.env.GA_MEASUREMENT_ID,
+    }
   },
   devtools: { enabled: true },
   css:["~/assets/css/main.css"],
