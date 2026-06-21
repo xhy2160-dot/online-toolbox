@@ -1,8 +1,11 @@
 <!-- components/ToolCard.vue -->
 <template>
   <div class="card" @mouseenter="hovered = true" @mouseleave="hovered = false">
-    <div class="icon-box">
-      <span class="icon">{{ tool.icon }}</span>
+    <div class="card-head">
+      <div class="icon-box">
+        <span class="icon">{{ tool.icon }}</span>
+      </div>
+      <span class="use">USE: {{ tool.clicks }}</span>
     </div>
     <h3 class="card-title">{{ tool.name }}</h3>
     <p class="card-desc">{{ tool.description }}</p>
@@ -41,6 +44,17 @@ defineProps<{
 
 .card:hover {
   background: #252538;
+}
+
+.card-head{
+  display: flex;
+  text-align: center;
+  justify-content: space-between;
+}
+
+.use{
+  font-size: 0.78rem;
+  color: #aaa;
 }
 
 .icon-box {

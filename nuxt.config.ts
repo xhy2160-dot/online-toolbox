@@ -11,6 +11,9 @@ export default defineNuxtConfig({
     nuxtSessionPswd:process.env.NUXT_SESSION_PASSWORD,
     public: {
       gaMeasurementId: process.env.GA_MEASUREMENT_ID,
+    },
+    future: {
+      compatibilityVersion: 4, // Ensures Nuxt 4 behavior
     }
   },
   devtools: { enabled: true },
