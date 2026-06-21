@@ -50,6 +50,27 @@
 </template>
 
 <script setup lang="ts">
+
+useSeoMeta({
+  title: 'Password Generator — Create Strong, Secure Passwords',
+  description: 'Generate strong, secure, random passwords with custom length and character options. Free, instant, runs entirely in your browser — nothing stored.',
+  ogTitle: 'Password Generator — Free Online Tool',
+  ogDescription: 'Create strong, secure passwords instantly. Customize length and character types. Free and private.',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+})
+
+useSchemaOrg([
+  defineWebPage(),
+  {
+    '@type': 'SoftwareApplication',
+    name: 'Password Generator',
+    applicationCategory: 'UtilitiesApplication',
+    operatingSystem: 'Any',
+    offers: { '@type': 'Offer', price: '0' }
+  }
+])
+
 const length = ref(16)
 const useUpper = ref(true)
 const useLower = ref(true)

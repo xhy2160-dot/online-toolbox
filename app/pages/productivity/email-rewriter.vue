@@ -52,6 +52,27 @@
 </template>
 
 <script setup lang="ts">
+useSeoMeta({
+  title: 'Email Rewriter — Rewrite Emails in Any Tone with AI',
+  description: 'Rewrite your emails instantly in a professional, friendly, formal, or assertive tone using AI. Free, fast, no signup required.',
+  ogTitle: 'Email Rewriter — Free AI Email Tool',
+  ogDescription: 'Paste your email and rewrite it in any tone instantly. Free and fast.',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+})
+
+useSchemaOrg([
+  defineWebPage(),
+  {
+    '@type': 'SoftwareApplication',
+    name: 'Email Rewriter',
+    applicationCategory: 'UtilitiesApplication',
+    operatingSystem: 'Any',
+    offers: { '@type': 'Offer', price: '0' }
+  }
+])
+
+
 const input = ref('')
 const output = ref('')
 const loading = ref(false)

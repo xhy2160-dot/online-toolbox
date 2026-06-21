@@ -69,6 +69,14 @@
 </template>
 
 <script setup lang="ts">
+useSeoMeta({
+  title: 'Online Toolbox — Free tools for everyday work',
+  description: 'Free, fast, privacy-first tools for developers and everyday work. JSON formatter, password generator, QR codes, and more — all client-side.',
+  ogTitle: 'Online Toolbox — Free tools for everyday work',
+  ogDescription: 'Free, fast, privacy-first tools. Most run client-side in your browser. Nothing retained.',
+  ogImage: 'https://xoxy.cc/og-image.png',
+  twitterCard: 'summary_large_image',
+})
 const { data: tools, pending, error } = await useFetch('/api/productivity/tools')
 </script>
 

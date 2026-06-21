@@ -41,6 +41,25 @@
 </template>
 
 <script setup lang="ts">
+
+useSeoMeta({
+  title: 'QR Code Generator — Free Online Tool',
+  description: 'Generate QR codes for URLs, text, or any data instantly in your browser. Free, no signup, nothing stored.',
+  ogTitle: 'QR Code Generator',
+  ogDescription: 'Generate QR codes instantly, free, client-side.',
+})
+
+useSchemaOrg([
+  defineWebPage(),
+  {
+    '@type': 'SoftwareApplication',
+    name: 'QR Code Generator',
+    applicationCategory: 'UtilitiesApplication',
+    operatingSystem: 'Any',
+    offers: { '@type': 'Offer', price: '0' }
+  }
+])
+
 import QRCode from 'qrcode'
 
 const text = ref('https://example.com')
