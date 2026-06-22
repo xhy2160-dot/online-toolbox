@@ -4,6 +4,7 @@
       <div class="nav-links" :class="{ 'mobile-open': mobileOpen }">
         <NuxtLink to="/" @click="closeAll">HOME</NuxtLink>
         <NuxtLink to="/productivity" @click="closeAll">PRODUCTIVITY</NuxtLink>
+        <NuxtLink to="/finance" @click="closeAll">FINANCE</NuxtLink>
         <NuxtLink to="/news" @click="closeAll">NEWS</NuxtLink>
         <NuxtLink to="/stocks" @click="closeAll">STOCKS</NuxtLink>
 

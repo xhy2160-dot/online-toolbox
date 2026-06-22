@@ -27,16 +27,16 @@
 
       <div class="stats">
         <div class="stat">
-          <span class="stat-num">172+</span>
+          <span class="stat-num">{{cat?.totalTools}}+</span>
           <span class="stat-label">FREE TOOLS</span>
         </div>
         <div class="stat">
-          <span class="stat-num">11</span>
-          <span class="stat-label">AI ON-DEVICE</span>
+          <span class="stat-num">{{cat?.categoryCounts[0]?.count}}</span>
+          <span class="stat-label">PRODUCTIVITY</span>
         </div>
         <div class="stat">
-          <span class="stat-num">27</span>
-          <span class="stat-label">MCP INTEGRATIONS</span>
+          <span class="stat-num">{{cat?.categoryCounts[1]?.count}}</span>
+          <span class="stat-label">FINANCE TOOLS</span>
         </div>
         <div class="stat">
           <span class="stat-num">$0</span>
@@ -59,8 +59,8 @@
         <span class="popular-title">POPULAR TOOLS</span>
       </div>
 
-      <div v-if="pending" class="state">Loading tools...</div>
-      <div v-else-if="error" class="state">Failed to load tools.</div>
+      <div v-if="pendingTools" class="state">Loading tools...</div>
+      <div v-else-if="errorTools" class="state">Failed to load tools.</div>
       <div v-else class="tools-grid">
         <ToolCard v-for="tool in tools" :key="tool.id" :tool="tool" />
       </div>
@@ -77,7 +77,19 @@ useSeoMeta({
   ogImage: 'https://xoxy.cc/og-image.png',
   twitterCard: 'summary_large_image',
 })
-const { data: tools, pending, error } = await useFetch('/api/productivity/tools')
+const {
+  data: tools,
+  pending: pendingTools,
+  error: errorTools
+} = useFetch('/api/productivity/tools')
+
+const {
+  data: cat,
+  pending: pendingCat,
+  error: errorCat
+} = useFetch('/api/cat/count-tools-by-cat')
+
+
 </script>
 
 <style scoped>

@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
- const { data: tools, pending, error } = await useFetch('/api/cat/1/get-tools-by-cat')
+const { data: tools, pending, error } = await useFetch('/api/cat/2/get-tools-by-cat')
 </script>
 
 <style scoped>

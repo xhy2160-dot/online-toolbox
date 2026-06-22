@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
             messages: [
                 {
                     role: "user",
-                    content: `Give a brief 2-3 sentence summary of why these stocks may have moved today: ${stocks}. Be concise and conversational, no markdown formatting or bullet points.`,
+                    content: `Give a summary of how the US stock market is going to trend today, what news or factors might affect it. no markdown formatting or bullet points.`,
                 },
             ],
             // Note: Changed to a standard stable Groq model ID.
