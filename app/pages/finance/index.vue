@@ -3,7 +3,7 @@
   <div class="page">
     <aside class="popular">
       <div class="tools-grid">
-        <ToolCard v-for="tool in tools" :key="tool.name" :tool="tool" />
+        <ToolsCard v-for="tool in tools" :key="tool.name" :tool="tool" />
       </div>
     </aside>
   </div>

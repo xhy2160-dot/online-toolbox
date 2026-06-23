@@ -6,7 +6,7 @@
       <div class="status-bar">
         <span class="status-dot"></span>
         <span class="status-line"></span>
-        <span class="status-text">172 TOOLS ONLINE</span>
+        <span class="status-text">{{cat?.totalTools}}+ TOOLS ONLINE</span>
       </div>
 
       <h1 class="hero-title">
@@ -19,11 +19,7 @@
         browser. <span class="hero-pro">Nothing</span> retained, uploads are destroyed after 2 hours.
       </p>
 
-      <div class="search-bar">
-        <span class="search-caret">></span>
-        <span class="search-placeholder">Search tools... (e.g. JSON, Base64, Password)</span>
-        <span class="search-kbd">⌘K</span>
-      </div>
+    <ToolsSearch/>
 
       <div class="stats">
         <div class="stat">
@@ -62,7 +58,7 @@
       <div v-if="pendingTools" class="state">Loading tools...</div>
       <div v-else-if="errorTools" class="state">Failed to load tools.</div>
       <div v-else class="tools-grid">
-        <ToolCard v-for="tool in tools" :key="tool.id" :tool="tool" />
+        <ToolsCard v-for="tool in tools" :key="tool.id" :tool="tool" />
       </div>
     </aside>
   </div>
@@ -160,45 +156,6 @@ const {
   color: #16a34a;
   font-weight: 600;
 }
-
-.search-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  background: #fff;
-  border: 1px solid #d8d0c7;
-  border-radius: 8px;
-  padding: 0.9rem 1.25rem;
-  cursor: pointer;
-  margin-bottom: 2.5rem;
-  transition: border-color 0.15s;
-}
-
-.search-bar:hover {
-  border-color: #aaa;
-}
-
-.search-caret {
-  color: #16a34a;
-  font-weight: 700;
-  font-size: 1rem;
-}
-
-.search-placeholder {
-  flex: 1;
-  color: #aaa;
-  font-size: 0.85rem;
-}
-
-.search-kbd {
-  font-size: 0.75rem;
-  color: #aaa;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-family: monospace;
-}
-
 .stats {
   display: flex;
   gap: 2rem;

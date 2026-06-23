@@ -27,12 +27,12 @@ export default defineEventHandler(async (event) => {
             messages: [
                 {
                     role: "user",
-                    content: `Give a summary of how the US stock market is going to trend today, what news or factors might affect it. no markdown formatting or bullet points.`,
+                    content: `why the us stock market is donw/up today? no markdown formatting or bullet points.`,
                 },
             ],
             // Note: Changed to a standard stable Groq model ID.
             // If you specifically want the openai/gpt-oss-20b model mix, make sure it's active in your plan!
-            model: "openai/gpt-oss-20b",
+            model: "llama-3.3-70b-versatile",
         });
 
         // 4. Safely extract the generated content

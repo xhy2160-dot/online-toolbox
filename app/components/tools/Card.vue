@@ -1,4 +1,4 @@
-<!-- components/ToolCard.vue -->
+<!-- components/Card.vue -->
 <template>
   <div class="card" @mouseenter="hovered = true" @mouseleave="hovered = false">
     <div class="card-head">

@@ -25,5 +25,5 @@ export const tools = mysqlTable('tools', {
     clicks: int('clicks').default(0).notNull(),
     description: text('description'),
     icon: varchar('icon', { length: 500 }),
-    url: varchar('url', { length: 300 }),
+    url: varchar('url', { length: 300 }).notNull(),
 })
