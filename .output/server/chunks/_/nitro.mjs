@@ -4555,7 +4555,7 @@ const assets = {
     "etag": "\"10be-n8egyE9tcb7sKGr/pYCaQ4uWqxI\"",
     "mtime": "2026-06-10T11:51:39.000Z",
     "size": 4286,
-    "path": "../public/favicon.ico"
+    "path": "../public/favicon.png"
   },
   "/robots.txt": {
     "type": "text/plain; charset=utf-8",

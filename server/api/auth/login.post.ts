@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
         .where(or(eq(users.username, identifier), eq(users.email, identifier)))
 
     const user = result[0]
+    console.log(user)
 
     if (!user) {
         throw createError({ statusCode: 401, message: 'Invalid credentials' })
@@ -26,8 +27,8 @@ export default defineEventHandler(async (event) => {
     }
 
     await setUserSession(event, {
-        user: { username: user.username, email: user.email }
+        user: { username: user.username, email: user.email, id: user.id },
     })
 
-    return { username: user.username, email: user.email }
+    return { username: user.username, email: user.email, id: user.id }
 })

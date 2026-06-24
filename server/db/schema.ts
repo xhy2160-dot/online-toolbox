@@ -25,5 +25,14 @@ export const tools = mysqlTable('tools', {
     clicks: int('clicks').default(0).notNull(),
     description: text('description'),
     icon: varchar('icon', { length: 500 }),
-    url: varchar('url', { length: 300 }).notNull(),
+    url: varchar('url', { length: 300 }).default('/').notNull(),
 })
+
+export const stocks = mysqlTable('stocks', {
+    ...baseColumns,
+    ticker: varchar('ticker', { length: 255 }).notNull(),
+    // Link it using .references(() => table.column)
+    userId: int('user_id',)
+        .notNull()
+        .references(() => users.id, { onDelete: 'cascade' }),
+});

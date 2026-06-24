@@ -1,4 +1,3 @@
-// server/api/auth/signup.post.ts
 import { eq, or } from 'drizzle-orm'
 import { db } from '~~/server/db'
 import { users } from '~~/server/db/schema'
@@ -31,19 +30,21 @@ export default defineEventHandler(async (event) => {
     try {
         const hashedPassword = await hashPassword(password)
 
-        // 2. Execute standard MySQL Insert (No .returning() block)
-        await db.insert(users).values({
+        // 2. Execute standard MySQL Insert and extract insertId from the execution metadata
+        const [result] = await db.insert(users).values({
             username,
             email,
             password: hashedPassword,
         })
 
-        // 3. Since we already have the sanitized 'username' and 'email' in memory 
-        // from the input validation step, we can use them safely without 
-        // a secondary SELECT query!
+        // Access the generated auto-increment ID from the MySQL driver result
+        const generatedUid = result.insertId
+
+        // 3. Construct the session object including the new uid
         const sessionUser = {
+            id: generatedUid, // <-- Added newly generated user ID here
             username: username,
-            email: email
+            email: email,
         }
 
         // 4. Save to cookie session

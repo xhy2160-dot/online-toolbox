@@ -1,7 +1,8 @@
 declare module '#auth-utils' {
     interface User {
         username: string
-        email: string
+        email: string,
+        id: number
     }
 }
 

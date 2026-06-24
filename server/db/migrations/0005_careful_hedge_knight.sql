@@ -1,0 +1,1 @@
+ALTER TABLE `tools` MODIFY COLUMN `url` varchar(300) NOT NULL DEFAULT '/';
