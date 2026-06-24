@@ -21,12 +21,12 @@
             maxlength="5"
             class="ticker-input"
         />
-        <button type="submit" class="add-btn" @click="handleAddTickerSubmit">Watch Ticker</button>
+        <button type="button" class="add-btn" @click="handleAddTickerSubmit">Watch Ticker</button>
       </form>
     </div>
 
     <div v-if="pending && !data" class="state">Loading...</div>
-    <div v-else-if="error" class="state">Failed to load stocks.</div>
+    <div v-else-if="error" class="state">Add a stock ticker.</div>
     <div v-else class="grid">
       <StockCard
           v-for="stock in data"
@@ -49,6 +49,7 @@ const newTicker = ref('')
 const { data, pending, error, refresh } = useFetch<any[]>('/api/stocks', {
   onResponse() {
     lastUpdated.value = new Date()
+    console.log(data)
   }
 })
 

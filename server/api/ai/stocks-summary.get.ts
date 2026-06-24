@@ -7,14 +7,7 @@ const groq = new Groq({ apiKey: useRuntimeConfig().groqApiKey || process.env.GRO
 let cache: { summary: string; timestamp: number } | null = null;
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hour caching layer
 
-export default defineEventHandler(async (event) => {
-    const query = getQuery(event);
-    const stocks = query.stocks as string;
-
-    // 1. Guard against unmounted/empty frontend lists
-    if (!stocks || stocks.trim() === '') {
-        return { summary: '' };
-    }
+export default defineEventHandler(async () => {
 
     // 2. Return cached information if within the valid timeframe
     if (cache && (Date.now() - cache.timestamp < CACHE_DURATION)) {
