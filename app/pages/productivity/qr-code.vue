@@ -88,7 +88,6 @@ async function generate() {
   })
 
   qrContainer.value.appendChild(canvas)
-  $fetch(`/api/productivity/${'QR Code Generator'}/counter`, { method: 'POST' })
 }
 
 function download() {

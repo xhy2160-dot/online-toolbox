@@ -104,7 +104,6 @@ const SYMBOLS = '!@#$%^&*()_+-=[]{}|;:,.<>?'
     result += pool[index % pool.length] ?? ''
   }
   password.value = result
-   $fetch(`/api/productivity/${'password generator'}/counter`, { method: 'POST' })
 }
 
 const strength = computed(() => {

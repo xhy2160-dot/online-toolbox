@@ -164,7 +164,6 @@ const breakdown = computed(() => {
 })
 
 const finalBalance = computed(() => {
-  $fetch(`/api/productivity/${'Compound Interest Calculator'}/counter`, { method: 'POST' })
   return breakdown.value[breakdown.value.length - 1]?.balance ?? 0
 })
 const totalInvested = computed(() => breakdown.value[breakdown.value.length - 1]?.invested ?? 0)

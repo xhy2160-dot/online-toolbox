@@ -1,5 +1,4 @@
 <template>
-  <!-- <div class="site" :class="{ 'no-scroll-view': route.path === '/' }"> -->
   <div class="site">
     <AppNav @open-login="showLogin = true" />
     <main class="main-content">
@@ -11,9 +10,22 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
-const route = useRoute()
 const showLogin = ref(false)
+
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+// Watch the route path changes to track tool impressions or global clicks
+watch(() => route.path, async (newPath:string) => {
+  if (!import.meta.client) return
+    await $fetch('/api/tools/counter/', {
+      method: 'POST',
+      body: { url: newPath } // e.g., "/tools/etf-calculator"
+    })
+
+}, { immediate: true })
+
 </script>
 
 <style>

@@ -77,7 +77,7 @@ const {
   data: tools,
   pending: pendingTools,
   error: errorTools
-} = useFetch('/api/productivity/tools')
+} = useFetch('/api/tools/popular')
 
 const {
   data: cat,

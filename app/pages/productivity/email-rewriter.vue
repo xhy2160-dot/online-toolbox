@@ -102,7 +102,6 @@ async function rewrite() {
       }
     })
     output.value = response.data.response
-    await $fetch(`/api/productivity/${'Email Rewriter'}/counter`, { method: 'POST' })
   } catch {
     output.value = 'Something went wrong. Please try again.'
   } finally {

@@ -1,164 +1,3 @@
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-
-// SEO / Meta tags
-useHead({
-  title: 'ETF Fee Calculator — xoxy.cc',
-  meta: [
-    { name: 'description', content: 'Calculate how fund fees and management expense ratios (MER) impact your long-term investment returns. Visualize the real cost of drag over time.' }
-  ]
-})
-
-definePageMeta({
-  layout: 'default'
-})
-
-// Calculator state inputs
-const initialInvestment = ref(10000)
-const annualContribution = ref(1200)
-const expectedReturn = ref(7) // annual gross return before fees
-const expenseRatio = ref(0.2) // ETF Expense Ratio / MER in %
-const horizonYears = ref(20)
-
-// Computed calculations
-const results = computed(() => {
-  const P = initialInvestment.value
-  const PMT = annualContribution.value
-  const rGross = expectedReturn.value / 100
-  const rNet = rGross - (expenseRatio.value / 100)
-  const t = horizonYears.value
-
-  const yearlyData = []
-
-  let grossBalance = P
-  let netBalance = P
-  let totalContributed = P
-
-  // Year 0 starting point
-  yearlyData.push({
-    year: 0,
-    grossBalance,
-    netBalance,
-    totalContributed,
-    lostToFees: 0
-  })
-
-  // Compound year by year (contributions made at beginning of year)
-  for (let y = 1; y <= t; y++) {
-    // Gross simulation (0% fees)
-    grossBalance = (grossBalance + PMT) * (1 + rGross)
-
-    // Net simulation (Post ETF expense ratio)
-    netBalance = (netBalance + PMT) * (1 + rNet)
-
-    totalContributed += PMT
-    const lostToFees = Math.max(0, grossBalance - netBalance)
-
-    yearlyData.push({
-      year: y,
-      grossBalance,
-      netBalance,
-      totalContributed,
-      lostToFees
-    })
-  }
-
-  const finalGross = grossBalance
-  const finalNet = netBalance
-  const totalFeesPaid = finalGross - finalNet
-  const efficiencyPct = finalGross > 0 ? (finalNet / finalGross) * 100 : 100
-
-  return {
-    finalGross,
-    finalNet,
-    totalFeesPaid,
-    efficiencyPct,
-    totalContributed,
-    yearlyData
-  }
-})
-
-// Format helpers
-const formatCurrency = (v: number) =>
-    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(v)
-
-const formatPercent = (v: number) => v.toFixed(2) + '%'
-
-// Chart path generator
-const chartPath = computed(() => {
-  const data = results.value?.yearlyData
-  if (!data || data.length < 2) return { grossLine: '', netLine: '', grossArea: '', netArea: '', maxVal: 1, xScale: () => 0, yScale: () => 0, data: [] }
-
-  const maxVal = Math.max(...data.map(d => d.grossBalance)) || 1
-  const W = 560
-  const H = 220
-  const pad = { l: 8, r: 8, t: 8, b: 8 }
-
-  const xScale = (i: number) => pad.l + (i / (data.length - 1)) * (W - pad.l - pad.r)
-  const yScale = (v: number) => H - pad.b - (v / maxVal) * (H - pad.t - pad.b)
-
-  const grossPoints = data.map((d, i) => `${xScale(i)},${yScale(d.grossBalance)}`).join(' ')
-  const netPoints = data.map((d, i) => `${xScale(i)},${yScale(d.netBalance)}`).join(' ')
-
-  const firstX = xScale(0)
-  const lastX = xScale(data.length - 1)
-  const bottomY = H - pad.b
-
-  const toPath = (points: string) => {
-    const pts = points.split(' ').map(p => p.split(',').map(Number))
-    if (pts.length < 2) return ''
-    let d = `M ${pts[0][0]} ${pts[0][1]}`
-    for (let i = 1; i < pts.length; i++) {
-      const cp1x = pts[i - 1][0] + (pts[i][0] - (pts[i - 2]?.[0] ?? pts[i - 1][0])) / 6
-      const cp1y = pts[i - 1][1] + (pts[i][1] - (pts[i - 2]?.[1] ?? pts[i - 1][1])) / 6
-      const cp2x = pts[i][0] - (pts[i + 1]?.[0] ?? pts[i][0] - pts[i - 1][0]) / 6
-      const cp2y = pts[i][1] - (pts[i + 1]?.[1] ?? pts[i][1] - pts[i - 1][1]) / 6
-      d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${pts[i][0]} ${pts[i][1]}`
-    }
-    return d
-  }
-
-  const gLine = toPath(grossPoints)
-  const nLine = toPath(netPoints)
-
-  return {
-    grossLine: gLine,
-    netLine: nLine,
-    grossArea: gLine ? `${gLine} L ${lastX},${bottomY} L ${firstX},${bottomY} Z` : '',
-    netArea: nLine ? `${nLine} L ${lastX},${bottomY} L ${firstX},${bottomY} Z` : '',
-    maxVal,
-    xScale,
-    yScale,
-    data
-  }
-})
-
-// Tooltip interaction
-const hoveredYear = ref<number | null>(null)
-const tooltipX = ref(0)
-const tooltipY = ref(0)
-
-function handleMouseMove(e: MouseEvent) {
-  const data = results.value?.yearlyData
-  if (!data || data.length < 2) return
-
-  const svg = e.currentTarget as SVGElement
-  const rect = svg.getBoundingClientRect()
-  const x = e.clientX - rect.left
-  const W = 560 - 16
-  const idx = Math.round((x - 8) / W * (data.length - 1))
-  const clamped = Math.max(0, Math.min(idx, data.length - 1))
-
-  hoveredYear.value = clamped
-  tooltipX.value = x
-  tooltipY.value = e.clientY - rect.top
-}
-
-function handleMouseLeave() {
-  hoveredYear.value = null
-}
-</script>
-
 <template>
   <div class="calculator-page">
     <div class="page-header">
@@ -256,32 +95,36 @@ function handleMouseLeave() {
             <path v-if="chartPath.grossLine" :d="chartPath.grossLine" class="line-gross" />
             <path v-if="chartPath.netLine" :d="chartPath.netLine" class="line-net" />
 
-            <template v-if="hoveredYear !== null && chartPath.data?.[hoveredYear]">
-              <line :x1="chartPath.xScale(hoveredYear)" y1="8" :x2="chartPath.xScale(hoveredYear)" y2="228" class="hover-line" />
-              <circle :cx="chartPath.xScale(hoveredYear)" :cy="chartPath.yScale(chartPath.data[hoveredYear].grossBalance)" r="4" class="hover-dot hover-dot--gross" />
-              <circle :cx="chartPath.xScale(hoveredYear)" :cy="chartPath.yScale(chartPath.data[hoveredYear].netBalance)" r="4" class="hover-dot hover-dot--net" />
+            <template v-if="hoveredPoint">
+              <line :x1="chartPath.xScale(hoveredYear!)" y1="8" :x2="chartPath.xScale(hoveredYear!)" y2="228"
+                class="hover-line" />
+              <circle :cx="chartPath.xScale(hoveredYear!)" :cy="chartPath.yScale(hoveredPoint.grossBalance)" r="4"
+                class="hover-dot hover-dot--gross" />
+              <circle :cx="chartPath.xScale(hoveredYear!)" :cy="chartPath.yScale(hoveredPoint.netBalance)" r="4"
+                class="hover-dot hover-dot--net" />
             </template>
           </svg>
 
-          <div v-if="hoveredYear !== null && chartPath.data?.[hoveredYear]" class="chart-tooltip" :style="{
-              left: Math.min(tooltipX + 12, 360) + 'px',
-              top: Math.max(tooltipY - 60, 0) + 'px'
-            }">
-            <div class="tooltip-year">Year {{ chartPath.data[hoveredYear].year }}</div>
+          <div v-if="hoveredPoint" class="chart-tooltip" :style="{
+            left: Math.min(tooltipX + 12, 360) + 'px',
+            top: Math.max(tooltipY - 60, 0) + 'px'
+          }">
+            <div class="tooltip-year">Year {{ hoveredPoint.year }}</div>
             <div class="tooltip-row">
               <span class="tooltip-dot tooltip-dot--gross"></span>
               <span class="tooltip-label">No Fee Growth:</span>
-              <span class="tooltip-val">{{ formatCurrency(chartPath.data[hoveredYear].grossBalance) }}</span>
+              <span class="tooltip-val">{{ formatCurrency(hoveredPoint.grossBalance) }}</span>
             </div>
             <div class="tooltip-row">
               <span class="tooltip-dot tooltip-dot--net"></span>
               <span class="tooltip-label">Actual Balance:</span>
-              <span class="tooltip-val">{{ formatCurrency(chartPath.data[hoveredYear].netBalance) }}</span>
+              <span class="tooltip-val">{{ formatCurrency(hoveredPoint.netBalance) }}</span>
             </div>
             <div class="tooltip-row">
               <span class="tooltip-dot tooltip-dot--fee"></span>
               <span class="tooltip-label">Lost to Fees:</span>
-              <span class="tooltip-val tooltip-val--red">{{ formatCurrency(chartPath.data[hoveredYear].lostToFees) }}</span>
+              <span class="tooltip-val tooltip-val--red">{{ formatCurrency(hoveredPoint.lostToFees)
+              }}</span>
             </div>
           </div>
 
@@ -301,7 +144,9 @@ function handleMouseLeave() {
               <span>Total Contributed</span>
               <span>Total Fee Loss</span>
             </div>
-            <div v-for="row in (results.yearlyData ? results.yearlyData.filter((_, i) => i % Math.max(1, Math.floor(horizonYears / 5)) === 0 || i === horizonYears) : [])" :key="row.year" class="milestone-row">
+            <div
+              v-for="row in (results.yearlyData ? results.yearlyData.filter((_, i) => i % Math.max(1, Math.floor(horizonYears / 5)) === 0 || i === horizonYears) : [])"
+              :key="row.year" class="milestone-row">
               <span class="milestone-year">{{ row.year }}</span>
               <span class="milestone-value">{{ formatCurrency(row.netBalance) }}</span>
               <span class="milestone-contrib">{{ formatCurrency(row.totalContributed) }}</span>
@@ -314,10 +159,210 @@ function handleMouseLeave() {
     </div>
 
     <p class="disclaimer">
-      This fee assessment models linear returns net of expense ratios compounded annually. Actual ETF internal fees are accrued daily inside the Net Asset Value (NAV) and fund dividends may affect real performance parameters.
+      This fee assessment models linear returns net of expense ratios compounded annually. Actual ETF internal fees are
+      accrued daily inside the Net Asset Value (NAV) and fund dividends may affect real performance parameters.
     </p>
   </div>
 </template>
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+
+// SEO / Meta tags
+useHead({
+  title: 'ETF Fee Calculator — xoxy.cc',
+  meta: [
+    { name: 'description', content: 'Calculate how fund fees and management expense ratios (MER) impact your long-term investment returns. Visualize the real cost of drag over time.' }
+  ]
+})
+
+definePageMeta({
+  layout: 'default'
+})
+
+// Calculator state inputs
+const initialInvestment = ref(10000)
+const annualContribution = ref(1200)
+const expectedReturn = ref(7) // annual gross return before fees
+const expenseRatio = ref(0.2) // ETF Expense Ratio / MER in %
+const horizonYears = ref(20)
+
+// Computed calculations
+const results = computed(() => {
+  const P = initialInvestment.value
+  const PMT = annualContribution.value
+  const rGross = expectedReturn.value / 100
+  const rNet = rGross - (expenseRatio.value / 100)
+  const t = horizonYears.value
+
+  const yearlyData = []
+
+  let grossBalance = P
+  let netBalance = P
+  let totalContributed = P
+
+  // Year 0 starting point
+  yearlyData.push({
+    year: 0,
+    grossBalance,
+    netBalance,
+    totalContributed,
+    lostToFees: 0
+  })
+
+  // Compound year by year (contributions made at beginning of year)
+  for (let y = 1; y <= t; y++) {
+    // Gross simulation (0% fees)
+    grossBalance = (grossBalance + PMT) * (1 + rGross)
+
+    // Net simulation (Post ETF expense ratio)
+    netBalance = (netBalance + PMT) * (1 + rNet)
+
+    totalContributed += PMT
+    const lostToFees = Math.max(0, grossBalance - netBalance)
+
+    yearlyData.push({
+      year: y,
+      grossBalance,
+      netBalance,
+      totalContributed,
+      lostToFees
+    })
+  }
+
+  const finalGross = grossBalance
+  const finalNet = netBalance
+  const totalFeesPaid = finalGross - finalNet
+  const efficiencyPct = finalGross > 0 ? (finalNet / finalGross) * 100 : 100
+
+  return {
+    finalGross,
+    finalNet,
+    totalFeesPaid,
+    efficiencyPct,
+    totalContributed,
+    yearlyData
+  }
+})
+
+// Format helpers
+const formatCurrency = (v: number) =>
+  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(v)
+
+const formatPercent = (v: number) => v.toFixed(2) + '%'
+
+type ChartPoint = {
+  year: number
+  grossBalance: number
+  netBalance: number
+  lostToFees: number
+}
+
+type ChartPath = {
+  grossLine: string
+  netLine: string
+  grossArea: string
+  netArea: string
+  maxVal: number
+  xScale: (i: number) => number
+  yScale: (v: number) => number
+  data: ChartPoint[]
+}
+
+// Chart path generator
+const chartPath = computed<ChartPath>(() => {
+  const data = results.value?.yearlyData
+  if (!data || data.length < 2) return { grossLine: '', netLine: '', grossArea: '', netArea: '', maxVal: 1, xScale: () => 0, yScale: () => 0, data: [] }
+
+  const maxVal = Math.max(...data.map(d => d.grossBalance)) || 1
+  const W = 560
+  const H = 220
+  const pad = { l: 8, r: 8, t: 8, b: 8 }
+
+  const xScale = (i: number) => pad.l + (i / (data.length - 1)) * (W - pad.l - pad.r)
+  const yScale = (v: number) => H - pad.b - (v / maxVal) * (H - pad.t - pad.b)
+
+  const grossPoints = data.map((d, i) => `${xScale(i)},${yScale(d.grossBalance)}`).join(' ')
+  const netPoints = data.map((d, i) => `${xScale(i)},${yScale(d.netBalance)}`).join(' ')
+
+  const firstX = xScale(0)
+  const lastX = xScale(data.length - 1)
+  const bottomY = H - pad.b
+
+  const toPath = (points: string) => {
+    const pts = points.split(' ').map(p => p.split(',').map(Number) as [number, number])
+    if (pts.length < 2) return ''
+
+    // Use Non-Null assertion (!) or destructuring on the guaranteed first item
+    const [startX, startY] = pts[0]!
+    let d = `M ${startX} ${startY}`
+
+    for (let i = 1; i < pts.length; i++) {
+      // Safely extract the current and previous points using non-null assertions
+      const current = pts[i]!
+      const prev = pts[i - 1]!
+
+      // Look behind and look ahead coordinates handle fallbacks elegantly
+      const prevPrevX = pts[i - 2]?.[0] ?? prev[0]
+      const prevPrevY = pts[i - 2]?.[1] ?? prev[1]
+      const nextX = pts[i + 1]?.[0] ?? current[0]
+      const nextY = pts[i + 1]?.[1] ?? current[1]
+
+      // Calculate smooth SVG cubic bezier control points
+      const cp1x = prev[0] + (current[0] - prevPrevX) / 6
+      const cp1y = prev[1] + (current[1] - prevPrevY) / 6
+      const cp2x = current[0] - (nextX - prev[0]) / 6
+      const cp2y = current[1] - (nextY - prev[1]) / 6
+
+      d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${current[0]} ${current[1]}`
+    }
+    return d
+  }
+
+  const gLine = toPath(grossPoints)
+  const nLine = toPath(netPoints)
+
+  return {
+    grossLine: gLine,
+    netLine: nLine,
+    grossArea: gLine ? `${gLine} L ${lastX},${bottomY} L ${firstX},${bottomY} Z` : '',
+    netArea: nLine ? `${nLine} L ${lastX},${bottomY} L ${firstX},${bottomY} Z` : '',
+    maxVal,
+    xScale,
+    yScale,
+    data
+  }
+})
+
+const hoveredPoint = computed(() => {
+  if (hoveredYear.value === null) return undefined
+  return chartPath.value.data[hoveredYear.value]
+})
+
+// Tooltip interaction
+const hoveredYear = ref<number | null>(null)
+const tooltipX = ref(0)
+const tooltipY = ref(0)
+
+function handleMouseMove(e: MouseEvent) {
+  const data = results.value?.yearlyData
+  if (!data || data.length < 2) return
+
+  const svg = e.currentTarget as SVGElement
+  const rect = svg.getBoundingClientRect()
+  const x = e.clientX - rect.left
+  const W = 560 - 16
+  const idx = Math.round((x - 8) / W * (data.length - 1))
+  const clamped = Math.max(0, Math.min(idx, data.length - 1))
+
+  hoveredYear.value = clamped
+  tooltipX.value = x
+  tooltipY.value = e.clientY - rect.top
+}
+
+function handleMouseLeave() {
+  hoveredYear.value = null
+}
+</script>
 
 <style scoped>
 .calculator-page {
@@ -540,8 +585,13 @@ function handleMouseLeave() {
   flex-shrink: 0;
 }
 
-.legend-dot--gross { background: #9ca3af; }
-.legend-dot--net { background: #4f8ef7; }
+.legend-dot--gross {
+  background: #9ca3af;
+}
+
+.legend-dot--net {
+  background: #4f8ef7;
+}
 
 .legend-label {
   margin-right: 12px;
@@ -583,8 +633,17 @@ function handleMouseLeave() {
   stroke-dasharray: 3 3;
 }
 
-.hover-dot--gross { fill: #9ca3af; stroke: #ffffff; stroke-width: 2; }
-.hover-dot--net { fill: #4f8ef7; stroke: #ffffff; stroke-width: 2; }
+.hover-dot--gross {
+  fill: #9ca3af;
+  stroke: #ffffff;
+  stroke-width: 2;
+}
+
+.hover-dot--net {
+  fill: #4f8ef7;
+  stroke: #ffffff;
+  stroke-width: 2;
+}
 
 /* Tooltip definitions */
 .chart-tooltip {
@@ -596,7 +655,7 @@ function handleMouseLeave() {
   pointer-events: none;
   z-index: 10;
   min-width: 190px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .tooltip-year {
@@ -614,14 +673,38 @@ function handleMouseLeave() {
   margin: 4px 0;
 }
 
-.tooltip-dot { width: 7px; height: 7px; border-radius: 50%; }
-.tooltip-dot--gross { background: #9ca3af; }
-.tooltip-dot--net { background: #4f8ef7; }
-.tooltip-dot--fee { background: #dc2626; }
+.tooltip-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
 
-.tooltip-label { color: #555555; flex: 1; }
-.tooltip-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: #111111; }
-.tooltip-val--red { color: #dc2626; }
+.tooltip-dot--gross {
+  background: #9ca3af;
+}
+
+.tooltip-dot--net {
+  background: #4f8ef7;
+}
+
+.tooltip-dot--fee {
+  background: #dc2626;
+}
+
+.tooltip-label {
+  color: #555555;
+  flex: 1;
+}
+
+.tooltip-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: #111111;
+}
+
+.tooltip-val--red {
+  color: #dc2626;
+}
 
 .chart-x-labels {
   display: flex;
@@ -639,7 +722,8 @@ function handleMouseLeave() {
   font-size: 13px;
 }
 
-.milestone-header, .milestone-row {
+.milestone-header,
+.milestone-row {
   display: grid;
   grid-template-columns: 50px 1fr 1fr 1fr;
 }
@@ -654,7 +738,8 @@ function handleMouseLeave() {
   border-bottom: 1px solid #e5e7eb;
 }
 
-.milestone-header span, .milestone-row span {
+.milestone-header span,
+.milestone-row span {
   padding: 8px 10px;
 }
 
@@ -663,13 +748,35 @@ function handleMouseLeave() {
   transition: background 0.1s;
 }
 
-.milestone-row:last-child { border-bottom: none; }
-.milestone-row:hover { background: #f9fafb; }
+.milestone-row:last-child {
+  border-bottom: none;
+}
 
-.milestone-year { color: #555555; font-weight: 600; }
-.milestone-value { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: #111111; }
-.milestone-contrib { font-family: 'JetBrains Mono', monospace; color: #555555; }
-.milestone-fee { font-family: 'JetBrains Mono', monospace; color: #dc2626; font-weight: 500; }
+.milestone-row:hover {
+  background: #f9fafb;
+}
+
+.milestone-year {
+  color: #555555;
+  font-weight: 600;
+}
+
+.milestone-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: #111111;
+}
+
+.milestone-contrib {
+  font-family: 'JetBrains Mono', monospace;
+  color: #555555;
+}
+
+.milestone-fee {
+  font-family: 'JetBrains Mono', monospace;
+  color: #dc2626;
+  font-weight: 500;
+}
 
 .disclaimer {
   margin-top: 2.5rem;
@@ -681,17 +788,73 @@ function handleMouseLeave() {
 
 /* Dark mode variations override */
 @media (prefers-color-scheme: dark) {
-  .page-header h1 { color: #f3f4f6; }
-  .header-sub, .field-label, .chart-legend, .tooltip-year, .tooltip-label, .milestone-year, .milestone-contrib { color: #9ca3af; }
-  .inputs-panel, .results-panel { background: #1a1a2e; border-color: #2d2d44; }
-  .field-input, .card-value, .tooltip-val, .milestone-value { color: #f3f4f6; }
-  .input-prefix-wrap, .input-suffix-wrap { background: #12122a; border-color: #2d2d44; }
-  .input-prefix-wrap:focus-within, .input-suffix-wrap:focus-within { border-color: #4f8ef7; background: #1a1a2e; }
-  .summary-card { background: #12122a; border-color: #2d2d44; }
-  .milestone-table, .milestone-header, .milestone-row, .chart-tooltip { border-color: #2d2d44; }
-  .milestone-header, .milestone-row:hover { background: #12122a; }
-  .hover-line { stroke: #2d2d44; }
-  .chart-tooltip { background: #1a1a2e; }
-  .milestone-fee, .tooltip-val--red { color: #f87171; }
+  .page-header h1 {
+    color: #f3f4f6;
+  }
+
+  .header-sub,
+  .field-label,
+  .chart-legend,
+  .tooltip-year,
+  .tooltip-label,
+  .milestone-year,
+  .milestone-contrib {
+    color: #9ca3af;
+  }
+
+  .inputs-panel,
+  .results-panel {
+    background: #1a1a2e;
+    border-color: #2d2d44;
+  }
+
+  .field-input,
+  .card-value,
+  .tooltip-val,
+  .milestone-value {
+    color: #f3f4f6;
+  }
+
+  .input-prefix-wrap,
+  .input-suffix-wrap {
+    background: #12122a;
+    border-color: #2d2d44;
+  }
+
+  .input-prefix-wrap:focus-within,
+  .input-suffix-wrap:focus-within {
+    border-color: #4f8ef7;
+    background: #1a1a2e;
+  }
+
+  .summary-card {
+    background: #12122a;
+    border-color: #2d2d44;
+  }
+
+  .milestone-table,
+  .milestone-header,
+  .milestone-row,
+  .chart-tooltip {
+    border-color: #2d2d44;
+  }
+
+  .milestone-header,
+  .milestone-row:hover {
+    background: #12122a;
+  }
+
+  .hover-line {
+    stroke: #2d2d44;
+  }
+
+  .chart-tooltip {
+    background: #1a1a2e;
+  }
+
+  .milestone-fee,
+  .tooltip-val--red {
+    color: #f87171;
+  }
 }
 </style>
